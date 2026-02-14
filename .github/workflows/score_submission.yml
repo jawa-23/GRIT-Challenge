@@ -1,69 +1,64 @@
-name: Score Submission
+name: Evaluate Submission
 
 on:
-  push:
+  pull_request_target:
     paths:
       - 'submissions/**'
-  workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
-  score:
+  evaluate:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the public repo
-      - name: Checkout public repo
-        uses: actions/checkout@v4
-
-      # 2️⃣ Checkout private repo containing test.parquet
-      - name: Checkout private test labels
-        uses: actions/checkout@v4
+      # 1️⃣ Checkout trusted code (main branch)
+      - uses: actions/checkout@v4
         with:
-          repository: jawa-23/GRIT-Secrets  # CHANGE to your private repo
-          path: secrets
+          ref: main
+
+      # 2️⃣ Fetch submission file from the PR
+      - name: Fetch submission from PR
+        run: |
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
+          git checkout pr -- submissions/*
 
       # 3️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: '3.10'
 
       # 4️⃣ Install dependencies
       - name: Install dependencies
         run: |
-          pip install pandas pyarrow
+          pip install pandas pyarrow scikit-learn
 
-      # 5️⃣ Get the latest submission
-      - name: Get latest submission
-        id: submission
+      # 5️⃣ Clone private test labels repo
+      - name: Clone private labels repo
+        env:
+          EVAL_TOKEN: ${{ secrets.EVAL_TOKEN }}   # PAT with read access to private repo
         run: |
-          FILE=$(ls submissions | sort | tail -n 1)
-          echo "SUBMISSION_FILE=submissions/$FILE" >> $GITHUB_ENV
-          echo "SUBMITTER=$FILE" >> $GITHUB_ENV
+          git clone https://${EVAL_TOKEN}@github.com/jawa-23/GRIT-Secrets.git private
 
-      # 6️⃣ Run evaluation script
-      - name: Run evaluation
-        id: eval
+      # 6️⃣ Run scoring
+      - name: Run scoring
         run: |
-          SCORE=$(python competition/evaluate.py ${{ env.SUBMISSION_FILE }} secrets/test_labels.parquet)
-          echo "SCORE=$SCORE" >> $GITHUB_ENV
+          python competition/evaluate.py submissions/* private/test_labels.parquet
+          # optional: redirect output to file if needed
 
-      # 7️⃣ Update leaderboard CSV (first submission only + competition ranking)
+      # 7️⃣ Update leaderboard CSV
       - name: Update leaderboard CSV
-        run: python competition/update_leaderboard_csv.py
+        run: python leaderboard/update_leaderboard_csv.py
+        env:
+          SUBMITTER: ${{ github.event.pull_request.user.login }}
+          SCORE: $(python -c "import competition.evaluate; print(competition.evaluate.last_score)")
 
-      # 8️⃣ Commit leaderboard CSV
+      # 8️⃣ Commit and push leaderboard CSV
       - name: Commit leaderboard CSV
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}   # PAT with push access to repo
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          git config user.name "challenge-bot"
+          git config user.email "challenge-bot@users.noreply.github.com"
           git add leaderboard/leaderboard.csv
-          git commit -m "Update leaderboard CSV"
-          git push
-
-      # 9️⃣ Clean up test labels (optional)
-      - name: Remove test labels
-        run: rm -f secrets/test_labels.parquet
+          git commit -m "Update leaderboard"
+          git push https://${BOT_TOKEN}@github.com/jawa-23/GRIT-Challenge.git main
