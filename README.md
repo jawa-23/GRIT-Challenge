@@ -10,7 +10,7 @@ The **GRIT challenge** evaluates models on the task of predicting the **next con
 
 Each contest is represented as a graph snapshot where:
 - Nodes correspond to a subset of participating contestants.
-- Edges connect contestants with similar ratings at the time of contest registration.
+- Edges connect contestants with similar ratings at the time of contest beginning.
 
 The task is to predict the `nextRating` of each contestant in an **autoregressive evaluation setting**, where past predictions are used to construct future inputs.
 
