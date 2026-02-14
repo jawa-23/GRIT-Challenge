@@ -132,10 +132,12 @@ MAE = (1/N) * Σ |y_true − y_pred|
 
 ### 1️⃣ Missing Values
 
-In a few samples, the raw dataset included rating changes but did not include the number of solved problems.
-This results in rare cases where:
+In a few samples, the raw dataset included rating changes but did not include the number of solved problems. This results in rare cases where:
+
 rating > oldRating
+
 num_problems_solved = 0
+
 Models must be resilient to these noisy samples.
 
 ---
