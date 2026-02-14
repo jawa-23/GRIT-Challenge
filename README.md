@@ -74,15 +74,11 @@ n0002,0.13
 ```
 
 Rules:
-- `id` must match exactly the IDs in `test_nodes.csv`
+- `id` must match exactly the IDs in `test_nodes.parquet`
 - One row per test node
 - `y_pred` must be a float in [0,1]
 - No missing or duplicate IDs
 
-A sample is provided in:
-```
-data/public/sample_submission.csv
-```
 
 ---
 
@@ -103,7 +99,6 @@ Example `metadata.json`:
   "team": "example_team",
   "model": "llm-only",
   "llm_name": "gpt-x",
-  "notes": "Temporal GNN with class weighting"
 }
 ```
 
@@ -128,39 +123,6 @@ Rankings are sorted by **descending score**.
 - No external or private data
 - No manual labeling of test data
 - No modification of evaluation scripts
-- Unlimited offline training is allowed
 - Only predictions are submitted
 
 Violations may result in disqualification.
-
----
-
-## 7. Human vs LLM Studies
-
-To use this competition for research:
-- Fix a time budget (e.g., 2 hours)
-- Fix a submission budget (e.g., 5 runs)
-- Record metadata fields (`model`, `llm_name`)
-- Compare:
-  - validity rate
-  - best score within K submissions
-  - score vs submission index
-
----
-
-## 8. Citation
-
-If you use this template in academic work, please cite the repository.
-
----
-
-## 9. License
-
-MIT License.
-
-## Interactive Leaderboard (GitHub Pages)
-
-This template includes an interactive leaderboard page inspired by modern benchmark sites.
-
-**Enable GitHub Pages** (Settings → Pages) and set the source to the `main` branch `/docs` folder.
-Then open `https://<your-org>.github.io/<repo>/leaderboard.html`.
