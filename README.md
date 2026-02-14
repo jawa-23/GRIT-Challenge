@@ -44,6 +44,7 @@ Each node contains the following information:
 
 Edges are constructed according to the following criteria:
 Two nodes *(u, v)* are connected if:
+
 |oldRating_u - oldRating_v| < Δ
 
 - The value of **Δ (delta)** was selected such that the number of edges in any snapshot is less than 30,000.
