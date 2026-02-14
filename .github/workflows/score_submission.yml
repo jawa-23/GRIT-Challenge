@@ -48,7 +48,7 @@ jobs:
       - name: Run evaluation
         id: eval
         run: |
-          SCORE=$(python competition/evaluate.py ${{ env.SUBMISSION_FILE }} secrets/test.parquet)
+          SCORE=$(python competition/evaluate.py ${{ env.SUBMISSION_FILE }} secrets/test_labels.parquet)
           echo "SCORE=$SCORE" >> $GITHUB_ENV
 
       # 7️⃣ Update leaderboard CSV (first submission only + competition ranking)
@@ -66,4 +66,4 @@ jobs:
 
       # 9️⃣ Clean up test labels (optional)
       - name: Remove test labels
-        run: rm -f secrets/test.parquet
+        run: rm -f secrets/test_labels.parquet
