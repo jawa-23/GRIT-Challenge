@@ -133,11 +133,9 @@ MAE = (1/N) * Σ |y_true − y_pred|
 ### 1️⃣ Missing Values
 
 In a few samples, the raw dataset included rating changes but did not include the number of solved problems.
-
 This results in rare cases where:
 rating > oldRating
 num_problems_solved = 0
-
 Models must be resilient to these noisy samples.
 
 ---
@@ -145,7 +143,6 @@ Models must be resilient to these noisy samples.
 ### 2️⃣ Inconsistent Participation
 
 Some contestants participate irregularly.
-
 The model must account for the `participation_gap` when predicting the next rating.
 
 ---
@@ -153,9 +150,7 @@ The model must account for the `participation_gap` when predicting the next rati
 ### 3️⃣ Registration Rules
 
 Contestants register for contests before they start.
-
 As long as a contestant registers, they are considered a participant, and the contest affects their rating.
-
 If a contestant registers but does not solve any problems, their rating may drop as if they participated and solved none.
 
 ---
@@ -163,7 +158,6 @@ If a contestant registers but does not solve any problems, their rating may drop
 ### 4️⃣ Error Accumulation
 
 Because evaluation is autoregressive:
-
 - Prediction errors propagate forward.
 - Mistakes in early contests affect later predictions.
 - Models must remain stable over long horizons.
@@ -173,7 +167,6 @@ Because evaluation is autoregressive:
 ## 🎯 Goal
 
 Develop a model that:
-
 - Leverages graph structure within contests  
 - Handles irregular participation  
 - Remains stable under autoregressive rollout  
