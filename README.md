@@ -1,308 +1,166 @@
-\# Codeforces Temporal Rating Prediction Challenge
 
+# GNN Coding Competition Template
 
+This repository provides a **secure, reproducible template** for running a
+Graph Neural Network (GNN) competition that supports **humans and LLMs**
+competing on equal footing.
 
-This repository contains the Codeforces Temporal Rating Prediction Challenge — a benchmark designed to evaluate graph‑based models on the task of predicting competitive programmer rating evolution on a dynamic homogeneous graph.
+The design intentionally **does not execute participant code**. Instead,
+participants submit **predictions only**, which are automatically evaluated
+and ranked on a public leaderboard using GitHub Actions.
 
-
-
-Participants will develop models that take \*\*historical user and contest information\*\* and \*\*graph structure\*\* as input, and output predictions for user ratings at their next contest participation.
-
-
-
----
-
-
-
-\## 🧠 Overview
-
-
-
-Competitive programming platforms such as Codeforces provide rich longitudinal data reflecting how participants’ skills evolve over time. We formulate this evolution as a \*\*dynamic homogeneous graph problem\*\* where:
-
-
-
-\- Nodes represent users at specific contests
-
-\- Edges capture temporal continuity and competitive proximity
-
-\- Models must operate in an \*\*autoregressive setting\*\*, predicting future ratings based only on past and present information
-
-
-
-This challenge encourages research into temporal message passing, autoregressive reasoning, and robust prediction under evolving graph structure.
-
-
+This makes the competition:
+- Safe (no untrusted code execution)
+- Fully reproducible
+- Suitable for human-vs-LLM evaluation studies
 
 ---
 
+## 1. Task Overview
 
+**Task:** Node classification on a graph  
+**Input:** Public graph structure and node features  
+**Output:** Predictions for unseen test nodes  
+**Metric:** ROC-AUC (binary classification)
 
-\## 📦 Data
-
-
-
-The dataset is organized into training and test splits, each representing \*\*events over time\*\*. Each row corresponds to a user’s participation in a contest.
-
-
-
-\### Node representation
-
-
-
-Each node corresponds to: 
-
-
-
-(user\_id, contest\_id)
-
-
-
-and includes features known at the end of contest \\( t \\):
-
-
-
-| Feature                      | Description |
-
-|-----------------------------|-------------|
-
-| `old\_rating`                | Rating before contest \\(t\\) |
-
-| `rating`                   | Rating after contest \\(t\\) |
-
-| `num\_problems\_solved`      | Number of problems solved in contest \\(t\\) |
-
-| `problems\_solved`          | Representation of the specific problems solved |
-
-| `participation\_gap`        | Number of contests since last participation |
-
-| `contest\_participant\_count`| Official number of participants in contest \\(t\\) |
-
-
-
-\*\*Important:\*\* Participants should not use future ratings beyond the current input.
-
-
+Participants train any GNN or non-GNN model *offline* and submit predictions
+for the test nodes.
 
 ---
 
+## 2. Repository Structure
 
-
-\## 🔗 Graph Construction
-
-
-
-The graph evolves across contests and contains two edge modalities:
-
-
-
-\### Temporal edges
-
-
-
-For each user, connect their participation nodes chronologically:
-
-
-
-(node at contest t) → (node at contest t')
-
-
-
-where \\( t' \\) is the next contest this user appears in.
-
-
-
-These edges allow models to pass user‑specific historical information forward.
-
-
-
----
-
-
-
-\### Neighborhood edges
-
-
-
-Within the same contest snapshot, connect users whose starting rating (old\_rating) is similar:
-
-
-
-(u\_i, t) — (u\_j, t) if |old\_rating\_i − old\_rating\_j| ≤ δ
-
-
-
-These \*peer similarity edges\* encode competitive proximity.
-
-
+```
+.
+├── data/
+│   ├── public/
+│   │   ├── train_edges.csv
+│   │   ├── train_labels.csv
+│   │   ├── val_edges.csv
+│   │   ├── val_labels.csv
+│   │   ├── test_edges.csv
+│   │   ├── test_nodes.csv
+│   │   └── sample_submission.csv
+│   └── private/
+│       └── test_labels.csv   # never committed (used only in CI)
+├── competition/
+│   ├── config.yaml
+│   ├── validate_submission.py
+│   ├── evaluate.py
+│   └── metrics.py
+├── submissions/
+│   ├── README.md
+│   └── inbox/
+├── leaderboard/
+│   ├── leaderboard.csv
+│   └── leaderboard.md
+└── .github/workflows/
+    ├── score_submission.yml
+    └── publish_leaderboard.yml
+```
 
 ---
 
+## 3. Submission Format
 
+Participants submit a **single CSV file**:
 
-\## 🎯 Prediction Task
+**predictions.csv**
+```
+id,y_pred
+n0001,0.92
+n0002,0.13
+...
+```
 
+Rules:
+- `id` must match exactly the IDs in `test_nodes.csv`
+- One row per test node
+- `y_pred` must be a float in [0,1]
+- No missing or duplicate IDs
 
-
-Your model must, for each node in the test set, produce:
-
-
-
-next\_rating
-
-
-
-This is the rating of the user at their next contest participation, which is not present in the test features.
-
-
-
-\#### Autoregressive protocol
-
-
-
-\- The model predicts ratings sequentially.
-
-\- For multiple test contests for the same user, the model should use its own previous predictions as input (`old\_rating`) for later steps.
-
-\- True labels of future test events must not be used during prediction.
-
-
+A sample is provided in:
+```
+data/public/sample_submission.csv
+```
 
 ---
 
+## 4. How to Submit
 
+1. Fork this repository
+2. Create a new folder:
+```
+submissions/inbox/<team_name>/<run_id>/
+```
+3. Add:
+   - `predictions.csv`
+   - `metadata.json`
 
-\## 📊 Evaluation
+Example `metadata.json`:
+```json
+{
+  "team": "example_team",
+  "model": "llm-only",
+  "llm_name": "gpt-x",
+  "notes": "Temporal GNN with class weighting"
+}
+```
 
+4. Open a Pull Request to `main`
 
-
-Predictions are assessed with the following metrics:
-
-
-
-\### Primary metric
-
-
-
-\*\*Mean Absolute Error (MAE)\*\* between predicted and true ratings:
-
-
-
-\\\[
-
-\\text{MAE} = \\frac{1}{N} \\sum\_{i=1}^N | \\hat{y}\_i - y\_i |
-
-\\]
-
-
-
-This is the \*\*official ranking metric\*\* on the leaderboard.
-
-
+The PR will be **automatically scored** and the result posted as a comment.
 
 ---
 
+## 5. Leaderboard
 
+After a PR is merged, the submission is added to:
+- `leaderboard/leaderboard.csv`
+- `leaderboard/leaderboard.md`
 
-\### Secondary metric
-
-
-
-\*\*Root Mean Squared Error (RMSE)\*\*:
-
-
-
-\\\[
-
-\\text{RMSE} = \\sqrt{\\frac{1}{N} \\sum\_{i=1}^N (\\hat{y}\_i - y\_i)^2}
-
-\\]
-
-
-
-RMSE is \*\*reported\*\* as an additional measure of prediction stability and to help distinguish models with similar MAE.
-
-
+Rankings are sorted by **descending score**.
 
 ---
 
+## 6. Rules
 
+- No external or private data
+- No manual labeling of test data
+- No modification of evaluation scripts
+- Unlimited offline training is allowed
+- Only predictions are submitted
 
-\### Diagnostic metrics (not on leaderboard)
-
-
-
-The following may be useful for model analysis:
-
-
-
-\- Step‑ahead error curves (e.g., MAE at 1–5 steps ahead)
-
-\- Directional accuracy (predicting up/down correctly)
-
-\- Error drift over long sequences
-
-
+Violations may result in disqualification.
 
 ---
 
+## 7. Human vs LLM Studies
 
+To use this competition for research:
+- Fix a time budget (e.g., 2 hours)
+- Fix a submission budget (e.g., 5 runs)
+- Record metadata fields (`model`, `llm_name`)
+- Compare:
+  - validity rate
+  - best score within K submissions
+  - score vs submission index
 
-\## 🖇 Submission Format
+---
 
+## 8. Citation
 
+If you use this template in academic work, please cite the repository.
 
-Your submission must be a CSV with two columns:
+---
 
+## 9. License
 
+MIT License.
 
-```csv
+## Interactive Leaderboard (GitHub Pages)
 
-node\_id,predicted\_next\_rating
+This template includes an interactive leaderboard page inspired by modern benchmark sites.
 
-
-
-* node\_id refers to the test node identifier
-
-
-
-* predicted\_next\_rating is your model’s forecast of that user’s next rating
-
-
-
-Predictions should be in the same order as test.csv.
-
-
-
-📜 Rules
-
-
-
-No external Codeforces data: Do not incorporate additional Codeforces data not provided in this dataset.
-
-
-
-Autoregressive only: Models must run in a sequential prediction setting; use their own predictions as inputs for future test steps.
-
-
-
-No peeking at future labels: Participants must not use true future ratings from test nodes.
-
-
-
-No handcrafted heuristics exploiting hidden information. Models should learn from the provided structure and features.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+**Enable GitHub Pages** (Settings → Pages) and set the source to the `main` branch `/docs` folder.
+Then open `https://<your-org>.github.io/<repo>/leaderboard.html`.
