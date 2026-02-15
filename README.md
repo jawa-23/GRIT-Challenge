@@ -262,8 +262,6 @@ After a PR is merged, the submission is added to:
 - `leaderboard/leaderboard.csv`
 - `leaderboard/leaderboard.md`
 
-Rankings are sorted by **descending score**.
-
 ---
 
 ## Rules
