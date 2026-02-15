@@ -77,3 +77,6 @@ jobs:
           git add leaderboard/leaderboard.csv
           git commit -m "Update leaderboard"
           git push https://${BOT_TOKEN}@github.com/jawa-23/GRIT-Challenge.git main
+
+      - name: Copy CSV to docs
+        run: cp leaderboard/leaderboard.csv docs/leaderboard.csv
