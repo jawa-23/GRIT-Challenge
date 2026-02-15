@@ -13,40 +13,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout trusted code (main branch)
+      # Checkout trusted code (main branch)
       - uses: actions/checkout@v4
         with:
           ref: main
 
-      # 2️⃣ Fetch submission file from the PR
+      # Fetch submission file from the PR
       - name: Fetch submission from PR
         run: |
           git fetch origin pull/${{ github.event.pull_request.number }}/head:pr
           git checkout pr -- submissions/*
 
-      # 3️⃣ Set up Python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      # 4️⃣ Install dependencies
+      # Install dependencies
       - name: Install dependencies
         run: |
           pip install pandas pyarrow scikit-learn numpy
 
-      # 5️⃣ Clone private test labels repo
+      # Clone private test labels repo
       - name: Clone private labels repo
         env:
           EVAL_TOKEN: ${{ secrets.EVAL_TOKEN }}   # PAT with read access to private repo
         run: |
           git clone https://${EVAL_TOKEN}@github.com/jawa-23/GRIT-Secrets.git private
 
-      # 6️⃣ Run scoring
+      # Run scoring
       - name: Run scoring
         run: |
           python competition/evaluate.py submissions/* private/test_labels.parquet
-          # optional: redirect output to file if needed
+          
 
       # after scoring
       - name: Read score
@@ -60,14 +60,14 @@ jobs:
           SCORE: ${{ steps.get_score.outputs.SCORE }}
 
 
-      # 7️⃣ Update leaderboard CSV
+      # Update leaderboard CSV
       - name: Update leaderboard CSV
         run: python leaderboard/update_leaderboard_csv.py
         env:
           SUBMITTER: ${{ github.event.pull_request.user.login }}
           SCORE: $(python -c "import competition.evaluate; print(competition.evaluate.last_score)")
 
-      # 8️⃣ Commit and push leaderboard CSV
+      # Commit and push leaderboard CSV
       - name: Commit leaderboard CSV
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}   # PAT with push access to repo
