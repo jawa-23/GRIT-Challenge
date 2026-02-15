@@ -30,7 +30,7 @@ jobs:
       # 4️⃣ Install dependencies
       - name: Install dependencies
         run: |
-          pip install pandas pyarrow scikit-learn
+          pip install pandas pyarrow scikit-learn numpy
 
       # 5️⃣ Clone private test labels repo
       - name: Clone private labels repo
@@ -44,6 +44,18 @@ jobs:
         run: |
           python competition/evaluate.py submissions/* private/test_labels.parquet
           # optional: redirect output to file if needed
+
+      # after scoring
+      - name: Read score
+        id: get_score
+        run: echo "SCORE=$(cat score.txt)" >> $GITHUB_OUTPUT
+      
+      - name: Update leaderboard CSV
+        run: python leaderboard/update_leaderboard_csv.py
+        env:
+          SUBMITTER: ${{ github.event.pull_request.user.login }}
+          SCORE: ${{ steps.get_score.outputs.SCORE }}
+
 
       # 7️⃣ Update leaderboard CSV
       - name: Update leaderboard CSV
