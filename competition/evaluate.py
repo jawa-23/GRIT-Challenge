@@ -1,11 +1,12 @@
 
 import pandas as pd
 import sys
+import pyarrow
 from metrics import MAE
 
 def main(pred_path, label_path):
     preds = pd.read_csv(pred_path).sort_values("id")
-    labels = pd.read_csv(label_path).sort_values("id")
+    labels = pd.read_parquet(label_path).sort_values("id")
 
     merged = labels.merge(preds, on="id", how="inner")
     if len(merged) != len(labels):
