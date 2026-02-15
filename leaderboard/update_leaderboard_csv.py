@@ -9,17 +9,18 @@ score = float(os.environ["SCORE"])
 try:
     df = pd.read_csv(lb_path)
 except FileNotFoundError:
-    df = pd.DataFrame(columns=["name", "score"])
+    df = pd.DataFrame(columns=["team", "score"])
 
 # Only add new submission if participant not already in leaderboard
-if submitter not in df['name'].values:
-    df = pd.concat([df, pd.DataFrame([[submitter, score]], columns=["name","score"])])
+if submitter not in df['team'].values:
+    df = pd.concat([df, pd.DataFrame([[submitter, score]], columns=["team","score"])])
 
-# Sort descending by score
-df = df.sort_values("score", ascending=False).reset_index(drop=True)
+# Sort ascending by score
+df = df.sort_values("score", ascending=True).reset_index(drop=True)
 
 # Competition ranking: ties share rank, next ranks skipped
-df['rank'] = df['score'].rank(method='max', ascending=False).astype(int)
+df['rank'] = df['score'].rank(method='min', ascending=True).astype(int)
 
 # Save updated leaderboard
 df.to_csv(lb_path, index=False)
+
