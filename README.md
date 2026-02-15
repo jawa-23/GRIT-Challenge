@@ -8,7 +8,7 @@
 
 ---
 
-## 📌 Overview
+## 📌 1- Overview
 
 The **GRIT challenge** evaluates models on the task of predicting the **next contest rating** of competitive programmers on CodeForces.
 
@@ -20,7 +20,7 @@ The task is to predict the `nextRating` of each contestant in an **autoregressiv
 
 ---
 
-## 📂 Data
+## 📂 2- Data
 ### Data Description
 The dataset is based on **Codeforces Competitive History from Kaggle**. Multiple preprocessing steps were applied to tailor it to the graph structure and the GRIT challenge.
 
@@ -80,7 +80,7 @@ contest_id, src, dst
 
 ---
 
-## 🧪 Testing & Evaluation
+## 🧪 3- Testing & Evaluation
 
 Model evaluation is performed in an **autoregressive manner**.
 
@@ -132,7 +132,7 @@ MAE = (1/N) * Σ |y_true − y_pred|
 
 ---
 
-## ⚠️ Why is GRIT Challenging?
+## ⚠️ 4- Why is GRIT Challenging?
 
 ### 1️⃣ Missing Values
 
@@ -170,7 +170,7 @@ Because evaluation is autoregressive:
 
 ---
 
-## 🎯 Goal
+## 🎯 5- Goal
 
 Develop a model that:
 - Leverages graph structure within contests  
@@ -180,7 +180,7 @@ Develop a model that:
 
 ---
 
-## Repository Structure
+## 6- Repository Structure
 
 ```
 .
@@ -210,7 +210,7 @@ Develop a model that:
 ```
 ---
 
-## Submission Format
+## 7- Submission Format
 
 Participants submit a **single CSV file**:
 
@@ -230,7 +230,7 @@ Rules:
 
 ---
 
-## How to Submit
+## 8- How to Submit
 
 1. Fork this repository
 2. Create a new folder:
@@ -256,7 +256,7 @@ The PR will be **automatically scored** and the result posted as a comment.
 
 ---
 
-## Leaderboard
+## 9- Leaderboard
 
 After a PR is merged, the submission is added to:
 - `leaderboard/leaderboard.csv`
@@ -264,7 +264,7 @@ After a PR is merged, the submission is added to:
 
 ---
 
-## Rules
+## 10- Rules
 
 - No external or private data
 - No manual labeling of test data
