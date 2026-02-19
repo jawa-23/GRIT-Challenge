@@ -1,10 +1,11 @@
 
 import pandas as pd
+import pyarrow
 import sys
 
 def main(pred_path, test_nodes_path):
     preds = pd.read_csv(pred_path)
-    test_nodes = pd.read_csv(test_nodes_path)
+    test_nodes = pd.read_parquet(test_nodes_path)
 
     if "id" not in preds.columns or "y_pred" not in preds.columns:
         raise ValueError("predictions.csv must contain id and y_pred")
