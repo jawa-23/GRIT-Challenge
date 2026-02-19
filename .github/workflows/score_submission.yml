@@ -1,4 +1,4 @@
-name: Evaluate Submission
+name: Decrypt, Validate, and Evaluate Submission
 
 on:
   pull_request_target:
@@ -21,7 +21,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          path: repo_main
+          path: main_repo
 
       - name: Checkout PR head branch (submission source)
         uses: actions/checkout@v4
@@ -29,10 +29,10 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-          path: repo_pr
+          path: pr_repo
           persist-credentials: false
 
-      - name: Detect and validate changed submission files
+      - name: Detect and validate changed files in PR
         id: detect
         uses: actions/github-script@v7
         with:
@@ -96,19 +96,45 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: |
-          pip install pandas pyarrow scikit-learn numpy
+          pip install pandas pyarrow scikit-learn numpy cryptography
 
       # Clone private test labels repo
       - name: Clone private labels repo
         env:
           LABELS_TOKEN: ${{ secrets.LABELS_TOKEN }}   # PAT with read access to private repo
         run: |
-          git clone https://${LABELS_TOKEN}@github.com/jawa-23/GRIT-Secrets.git private
-
-      # Run scoring
-      - name: Run scoring
+          git clone https://${LABELS_TOKEN}@github.com/jawa-23/GRIT-Secrets.git main_repo/data/private
+          
+      - name: Get private key and decrypt submission
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: |
-          python competition/evaluate.py submissions/* private/test_labels.parquet
+          set -e
+          
+          # Write secret to file
+          echo "$PRIVATE_KEY" > main_repo/data/private/private_key.pem
+          chmod 600 main_repo/data/private/private_key.pem
+          
+          # Decrypt Predictions
+          python main_repo/encryption/decrypt.py \
+            "pr_repo/${{ steps.detect.outputs.pred_file }}" \
+            "main_repo/data/private/private_key.pem" \
+            "main_repo/data/private/predictions_decrypted.csv"
+            
+          # Check file exists and not empty
+          test -s main_repo/data/private/predictions_decrypted.csv
+          
+      # Validate predictions file
+      - name: Validate submission
+        run: |
+          python competition/validate_submission.py \
+            "main_repo/data/private/predictions_decrypted.csv" \
+            "main_repo/data/public/test_nodes.parquet"
+          
+      # Evaluate submission
+      - name: Run evaluation
+        run: |
+          python competition/evaluate.py
 
       # Read score from score.txt
       - name: Read score
