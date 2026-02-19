@@ -11,11 +11,11 @@ def main(score, leaderboard_path, metadata_path):
     score = float(score)
     metadata_path = Path(metadata_path)
     leaderboard_path = Path(leaderboard_path)
-    """
+
     if not metadata_path.exists():
         print(f'This is the path to metadata: {metadata_path}')
         raise Exception("metadata.json not found")
-    """
+
     with open(metadata_path) as f:
         metadata = json.load(f)
 
@@ -58,6 +58,7 @@ if __name__ == "__main__":
         leaderboard_path=sys.argv[1],
         metadata_path=sys.argv[2]
     )
+
 
 
 
