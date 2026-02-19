@@ -5,13 +5,15 @@ from pathlib import Path
 from datetime import datetime
 import sys
 
-LEADERBOARD_PATH = Path("leaderboard/leaderboard.csv")
+#LEADERBOARD_PATH = Path("leaderboard/leaderboard.csv")
 
-def main(score, metadata_path):
+def main(score, leaderboard_path, metadata_path):
     score = float(score)
     metadata_path = Path(metadata_path)
+    leaderboard_path = Path(leaderboard_path)
 
     if not metadata_path.exists():
+        print(f'This is the path to metadata: {metadata_path}')
         raise Exception("metadata.json not found")
 
     with open(metadata_path) as f:
@@ -30,8 +32,8 @@ def main(score, metadata_path):
     }
 
     # Create leaderboard if it doesn't exist
-    if LEADERBOARD_PATH.exists():
-        df = pd.read_csv(LEADERBOARD_PATH)
+    if leaderboard_path.exists():
+        df = pd.read_csv(leaderboard_path)
     else:
         df = pd.DataFrame(columns=new_row.keys())
 
@@ -46,13 +48,15 @@ def main(score, metadata_path):
     df['rank'] = df['score'].rank(method='min', ascending=True).astype(int)
 
     # Save updated leaderboard
-    df.to_csv(LEADERBOARD_PATH, index=False)
+    df.to_csv(leaderboard_path, index=False)
     print("Leaderboard updated successfully.")
 
 
 if __name__ == "__main__":
     main(
         score=os.environ["SCORE"],
-        metadata_path=sys.argv[1]
+        leaderboard_path=sys.argv[1],
+        metadata_path=sys.argv[2]
     )
+
 
