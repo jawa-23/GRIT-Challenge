@@ -149,7 +149,7 @@ jobs:
   
       # Update leaderboard CSV
       - name: Update leaderboard CSV
-        run: 
+        run: |
             cd main_repo
             python leaderboard/update_leaderboard.py \
               "leaderboard/leaderboard.csv" \
