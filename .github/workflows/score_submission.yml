@@ -141,6 +141,12 @@ jobs:
             "main_repo/data/private/predictions_decrypted.csv" \
             "main_repo/data/private/test_labels.parquet"
 
+      # Debugging metadata file
+      - name: Debug metadata path
+        run: |
+          echo "Meta file path: '${{ steps.detect.outputs.meta_file }}'"
+          echo "Full PR path: 'pr_repo/${{ steps.detect.outputs.meta_file }}'"
+          
       # Update leaderboard CSV
       - name: Update leaderboard CSV
         run: python main_repo/leaderboard/update_leaderboard.py \
