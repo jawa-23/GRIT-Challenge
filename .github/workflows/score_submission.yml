@@ -84,7 +84,7 @@ jobs:
             }
 
             core.setOutput("pred_file", preds[0]);
-            core.setOutput("meta_file", metas[0]);
+            core.setOutput("meta_file", metas[0].trim());
             core.setOutput("run_dir", predDir);
 
 
