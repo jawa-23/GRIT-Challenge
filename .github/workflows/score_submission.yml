@@ -147,6 +147,17 @@ jobs:
           echo "Meta file path: '${{ steps.detect.outputs.meta_file }}'"
           echo "Full PR path: 'pr_repo/${{ steps.detect.outputs.meta_file }}'"
           
+      - name: List PR run folder
+        run: ls -l "pr_repo/submissions/inbox/temporary/0"
+        
+      - name: Test metadata file in Python
+        run: |
+          python - <<EOF
+          from pathlib import Path
+          meta_path = Path("pr_repo/submissions/inbox/temporary/0/metadata.json")
+          print("Exists:", meta_path.exists())
+          print("Is file:", meta_path.is_file())
+          EOF    
       # Update leaderboard CSV
       - name: Update leaderboard CSV
         run: python main_repo/leaderboard/update_leaderboard.py \
