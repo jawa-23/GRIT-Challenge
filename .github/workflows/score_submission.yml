@@ -135,40 +135,68 @@ jobs:
           
       # Evaluate submission
       - name: Run evaluation
+        id: evaluate
         run: |
           python main_repo/competition/evaluate.py \
             "main_repo/data/private/predictions_decrypted.csv" \
             "main_repo/data/private/test_labels.parquet"
 
-      # Read score from score.txt
-      - name: Read score
-        id: get_score
-        run: echo "SCORE=$(cat score.txt)" >> $GITHUB_OUTPUT
-
       # Update leaderboard CSV
       - name: Update leaderboard CSV
-        run: python leaderboard/update_leaderboard_csv.py
+        run: python leaderboard/update_leaderboard.py \
+              "pr_repo/${{ steps.detect.outputs.meta_file }}"
         env:
-          SCORE: ${{ steps.get_score.outputs.SCORE }}
+          SCORE: ${{ steps.evaluate.outputs.SCORE }}
 
 
-     # Copy CSV to docs
+      # Copy CSV to docs
       - name: Copy CSV to docs
-        run: cp leaderboard/leaderboard.csv docs/leaderboard.csv
+        run: cp main_repo/leaderboard/leaderboard.csv main_repo/docs/leaderboard.csv
 
-      - name: Commit leaderboard CSV
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      # Committing updated leaderboard csv to the public repo
+      - name: Commit leaderboard CSV 
+        working-directory: main_repo
         run: |
-          git config user.name "challenge-bot"
-          git config user.email "challenge-bot@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
       
-          git add leaderboard/leaderboard.csv docs/leaderboard.csv
+          git add leaderboard/leaderboard.csv
+          git add docs/leaderboard.csv
       
           if git diff --cached --quiet; then
             echo "No leaderboard changes to commit."
           else
             git commit -m "Update leaderboard"
-            git push https://${BOT_TOKEN}@github.com/jawa-23/GRIT-Challenge.git main
+            git push origin main
           fi
 
+      - name: Comment score on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: '✅ Submission evaluated successfully.
+              Score: ${{ steps.evaluate.outputs.SCORE }}
+              The leaderboard has been updated.'});
+
+      - name: Close submission PR
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              state: "closed"
+            });
+            
+      # Remove sensitive files
+      - name: Remove sensitive files
+        run: |
+          rm -f main_repo/data/private/private_key.pem
+          rm -f main_repo/data/private/predictions_decrypted.csv
+          rm -f main_repo/data/private/test_labels.parquet
