@@ -18,7 +18,10 @@ def main(pred_path, test_nodes_path):
 
     if ((preds["y_pred"] < 0)).any():
         raise ValueError("Predictions must be positive numbers")
-
+        
+    print("Pred columns:", preds.columns.tolist())
+    print("Test columns:", test_nodes.columns.tolist())
+    
     if set(preds["id"]) != set(test_nodes["id"]):
         raise ValueError("Prediction IDs do not match test nodes")
 
