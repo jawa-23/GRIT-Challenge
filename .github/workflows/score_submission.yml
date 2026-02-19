@@ -143,7 +143,7 @@ jobs:
 
       # Update leaderboard CSV
       - name: Update leaderboard CSV
-        run: python leaderboard/update_leaderboard.py \
+        run: python main_repo/leaderboard/update_leaderboard.py \
               "pr_repo/${{ steps.detect.outputs.meta_file }}"
         env:
           SCORE: ${{ steps.evaluate.outputs.SCORE }}
