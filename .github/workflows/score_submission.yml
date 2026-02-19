@@ -131,7 +131,7 @@ jobs:
         run: |
           python main_repo/competition/validate_submission.py \
             "main_repo/data/private/predictions_decrypted.csv" \
-            "main_repo/data/public/test_nodes.parquet"
+            "main_repo/data/private/test_labels.parquet"
           
       # Evaluate submission
       - name: Run evaluation
