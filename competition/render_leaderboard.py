@@ -4,7 +4,7 @@ from datetime import datetime
 
 ROOT = Path(__file__).resolve().parents[1]
 CSV_PATH = ROOT / "leaderboard" / "leaderboard.csv"
-MD_PATH = ROOT / "leaderboard" / "leaderboard.md"
+MD_PATH = ROOT / "docs" / "leaderboard.md"
 
 def read_rows():
   if not CSV_PATH.exists():
