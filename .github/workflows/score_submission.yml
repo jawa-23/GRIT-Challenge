@@ -149,9 +149,11 @@ jobs:
   
       # Update leaderboard CSV
       - name: Update leaderboard CSV
-        run: python main_repo/leaderboard/update_leaderboard.py \
-              "$(pwd)/main_repo/leaderboard/leaderboard.csv" \
-              "$(pwd)/pr_repo/${{ steps.detect.outputs.meta_file }}"
+        run: 
+            cd main_repo
+            python leaderboard/update_leaderboard.py \
+              "leaderboard/leaderboard.csv" \
+              "../pr_repo/${{ steps.detect.outputs.meta_file }}"
         env:
           SCORE: ${{ steps.evaluate.outputs.SCORE }}
 
