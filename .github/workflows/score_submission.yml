@@ -179,18 +179,6 @@ jobs:
             git push origin main
           fi
 
-      - name: Comment score on PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              body: '✅ Submission evaluated successfully.
-              Score: ${{ steps.evaluate.outputs.SCORE }}
-              The leaderboard has been updated.'});
-
       - name: Close submission PR
         if: success()
         uses: actions/github-script@v7
