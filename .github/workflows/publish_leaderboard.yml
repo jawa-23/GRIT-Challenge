@@ -1,10 +1,10 @@
 name: Publish Leaderboard
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - "leaderboard/leaderboard.csv"
+  workflow_run:
+    workflows: ["Decrypt, Validate, and Evaluate Submission"]
+    types:
+      - completed
 
 jobs:
   render:
