@@ -98,7 +98,7 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: |
-          pip install pandas pyarrow scikit-learn numpy cryptography
+          pip install pandas==2.3.3 pyarrow==23.0.0 scikit-learn==1.2.2 numpy==1.24.3 cryptography==46.0.5
 
       # Clone private test labels repo
       - name: Clone private labels repo
