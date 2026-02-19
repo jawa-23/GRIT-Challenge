@@ -5,7 +5,10 @@ on:
     workflows: ["Decrypt, Validate, and Evaluate Submission"]
     types:
       - completed
-
+      
+permissions:
+  contents: write
+  
 jobs:
   render:
     runs-on: ubuntu-latest
