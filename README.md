@@ -7,8 +7,7 @@
 [![Leaderboard](https://img.shields.io/badge/View-Leaderboard-blue?style=for-the-badge)](https://jawa-23.github.io/GRIT-Challenge/leaderboard)
 
 ---
-
-## 📌 1- Overview
+## 1. Overview
 
 The **GRIT challenge** evaluates models on the task of predicting the **next contest rating** of competitive programmers on CodeForces.
 
@@ -19,18 +18,16 @@ Each contest is represented as a graph snapshot where:
 The task is to predict the `nextRating` of each contestant in an **autoregressive evaluation setting**, where past predictions are used to construct future inputs.
 
 ---
-
-## 📂 2- Data
+## 2. Data
 ### Data Description
 The dataset is based on **Codeforces Competitive History from Kaggle**. Multiple preprocessing steps were applied to tailor it to the graph structure and the GRIT challenge.
 
 Each snapshot corresponds to a single contest:
 - Nodes represent a subset of participating contestants.
 - Edges connect nodes based on their relative ratings when entering the contest.
-
 ---
 
-### 🧩 Node Features
+### Node Features
 
 Each node contains the following information:
 - **node_id** – a unique identifier for each node in the dataset
@@ -38,25 +35,25 @@ Each node contains the following information:
 - **oldRating** – contestant’s rating when entering contest *i*  
 - **rating** – contestant’s rating after contest *i*  
 - **num_problems_solved** – number of problems solved in contest *i*  
-- **nextRating** – contestant’s rating in the next contest they participate in (*i+1*) → **target to be predicted**  
 - **participation_gap** – number of contests since the contestant’s last participation  
 - **contestant_count** – total number of contestants in contest *i*
-
+- **nextRating** – contestant’s rating in the next contest they participate in (*i+1*) → **target to be predicted**  
 ---
 
-### 🔗 Edge Construction
+### Edge Construction
 
 Edges are constructed according to the following criteria:
 Two nodes *(u, v)* are connected if:
 
-|oldRating_u - oldRating_v| < Δ
+$$
+\left| \text{oldRating}_u - \text{oldRating}_v \right| < \Delta
+$$
 
 - The value of **Δ (delta)** was selected such that the number of edges in any snapshot is less than 30,000.
 - If a node does not satisfy the above condition with any other node, it is connected to up to **three nodes** with the smallest rating difference (when possible), to avoid isolated nodes.
-
 ---
 
-### 🏗 Training Data Structure
+### Training Data Structure
 
 Each contest snapshot is represented by:
 - An adjacency matrix  
@@ -80,7 +77,7 @@ contest_id, src, dst
 
 ---
 
-## 🧪 3- Testing & Evaluation
+## 3. Testing & Evaluation
 
 Model evaluation is performed in an **autoregressive manner**.
 
@@ -89,7 +86,6 @@ Model evaluation is performed in an **autoregressive manner**.
 For contestants appearing for the first time in the testing data:
 
 - All features except `nextRating` are available.
-
 ---
 
 #### Subsequent Appearances
@@ -103,7 +99,6 @@ These values must be filled using your model’s previous predictions:
 
 - `rating` at contest *(i−1)* → becomes `oldRating` at contest *(i)*  
 - `nextRating` at contest *(i−1)* → becomes `rating` at contest *(i)*  
-
 ---
 
 #### 💡 Implementation Hint
@@ -122,46 +117,20 @@ At each contest snapshot in the test set:
 
 - Update these values for participating contestants.
 - Use them to fill missing features before making predictions.
-
 ---
 
-### 📊 Evaluation Metric
+### Evaluation Metric
 
 ##### Mean Absolute Error (MAE)
-MAE = (1/N) * Σ |y_true − y_pred|
+$$
+\mathrm{MAE} = \frac{1}{N} \sum_{i=1}^{N} \left| y_{\text{true}, i} - y_{\text{pred}, i} \right|
+$$
 
 ---
 
-## ⚠️ 4- Why is GRIT Challenging?
+## 4. Why is GRIT Challenging?
 
-### 1️⃣ Missing Values
-
-In a few samples, the raw dataset included rating changes but did not include the number of solved problems. This results in rare cases where:
-
-rating > oldRating
-
-num_problems_solved = 0
-
-Your approach should handle these cases.
-
----
-
-### 2️⃣ Inconsistent Participation
-
-Some contestants participate irregularly.
-The model must account for the `participation_gap` when predicting the next rating.
-
----
-
-### 3️⃣ Registration Rules
-
-Contestants register for contests before they start.
-As long as a contestant registers, they are considered a participant, and the contest affects their rating.
-If a contestant registers but does not enter on contest day, their rating may drop as if they participated and solved none.
-
----
-
-### 4️⃣ Error Accumulation
+### 1) Error Accumulation
 
 Because evaluation is autoregressive:
 - Prediction errors propagate forward.
@@ -170,17 +139,46 @@ Because evaluation is autoregressive:
 
 ---
 
-## 🎯 5- Goal
+### 2) Inconsistent Participation
+
+Some contestants participate irregularly.
+The model must account for the `participation_gap` when predicting the next rating.
+
+---
+
+### 3) Registration Rules
+
+Contestants register for contests before they start.
+As long as a contestant registers, they are considered a participant, and the contest affects their rating.
+If a contestant registers but does not enter on contest day, their rating may drop as if they participated and solved none.
+
+---
+### 4) Missing Values
+
+In a few samples, the raw dataset included rating changes but did not include the number of solved problems. This results in rare cases where:
+
+$$
+\text{rating} > \text{oldRating}
+$$
+
+$$
+\text{num\\_problems\\_solved} = 0
+$$
+
+Your approach should handle these cases.
+
+---
+
+## 5. Goal
 
 Develop a model that:
 - Leverages graph structure within contests  
 - Handles irregular participation  
 - Remains stable under autoregressive rollout  
 - Minimizes MAE on the test set  
-
 ---
 
-## 6- Repository Structure
+## 6. Repository Structure
 
 ```
 .
@@ -210,65 +208,87 @@ Develop a model that:
 ```
 ---
 
-## 7- Submission Format
+## 7. Privacy Protocol
 
-Participants submit a **single CSV file**:
+To preserve privacy, private submissions are uploaded in encrypted form using the following protocol:
 
-**predictions.csv**
-```
-id,y_pred
-n0001,0.92
-n0002,0.13
-...
-```
-
-Rules:
-- `id` must match exactly the IDs in `test_nodes.parquet`
-- One row per test node
-- No missing or duplicate IDs
-
-
+1. Participants encrypt their predictions file locally using the provided public key (`encryption/public_key.pem`).
+2. Only the encrypted submission file is stored in the repository.
+3. The private decryption key and test labels are restored from GitHub Secrets via GitHub Actions.
+4. Decryption and scoring are performed within the runner environment, and all sensitive files are automatically deleted afterward.
+5. Only leaderboard updates are committed to the repository; results are visible on the live leaderboard.
+6. The pull request is automatically closed after score calculation.
 ---
+## 8. Submission Procedure
 
-## 8- How to Submit
-
+### Submitted Files
+You will be submitting two files:
+   1) `predictions.csv.enc`
+      This is an encrypted format of your predicitions file. Your predicitions file before encryption should be like this:
+        `predictions.csv`
+        ```
+        id,y_pred
+        2340,1440
+        2341,1200
+        ...
+        ```
+        
+    Rules:
+    - `id` must match exactly the IDs in `test_nodes.parquet`
+    - One row per test node
+    - No missing or duplicate IDs
+    - y_pred must be a non-negative integer
+    
+   2) `metadata.json`
+      This file should include your team name, your model type (Human, LLM, or Human + LLM), and any notes you want to include on the leaderboard.
+        Example `metadata.json`:
+        ```json
+        {
+          "team": "my_team",
+          "model": "Human",
+          "notes": "This is a test"
+        }
+        ```
+### Steps
 1. Fork this repository
-2. Create a new folder:
+2. Train your model locally on the training dataset provided in:
+   ```
+   data/public/train_nodes.parquet
+   data/public/train_edges.parquet
+   ```
+3. Use your trained model to generate the predictions.csv file for the testing dataset provided in:
+   ```
+   data/public/test_nodes.parquet
+   data/public/test_edges.parquet
+   ```
+4. Encrypt your predictions.csv using the following command in your cmd:
+   ```
+   python encryption/encrypt.py predictions.csv encryption/public_key.pem predictions.csv.enc
+   ```
+5. Create a new folder:
 ```
 submissions/inbox/<team_name>/<run_id>/
 ```
-3. Add:
-   - `predictions.csv`
-   - `metadata.json`
+   and upload your `predictions.csv.enc` and `metadata.json` to it.
 
-Example `metadata.json`:
-```json
-{
-  "team": "example_team",
-  "model": "llm-only",
-  "llm_name": "gpt-x",
-}
-```
+6. Open a Pull Request to `main`
 
-4. Open a Pull Request to `main`
-
-The PR will be **automatically scored** and the result posted as a comment.
+The PR will be **automatically scored** and the result will be added to the leaderboard.
 
 ---
 
-## 9- Leaderboard
+## 9. Leaderboard
 
-After a PR is merged, the submission is added to:
+After a PR is scored, the result is added to:
 - `leaderboard/leaderboard.csv`
 - `leaderboard/leaderboard.md`
-
 ---
 
-## 10- Rules
+## 10. Rules
 
 - No external or private data
 - No manual labeling of test data
 - No modification of evaluation scripts
-- Only predictions are submitted
+- Only encrypted predictions are submitted
 
 Violations may result in disqualification.
