@@ -182,29 +182,41 @@ Develop a model that:
 
 ```
 .
-├── data/
-│   ├── public/
-│   │   ├── train_edges.parquet
-│   │   ├── train_nodes.parquet
-│   │   ├── test_edges.parquet
-│   │   ├── test_nodes.parquet
-│   │   └── sample_submission.csv
-│   └── private/
-│       └── test_labels.parquet   # never committed (used only in CI)
+├── .github/
+│   └── workflows/
+│       ├── publish_leaderboard.yml
+│       └── score_submission.yml
 ├── competition/
 │   ├── config.yaml
-│   ├── validate_submission.py
 │   ├── evaluate.py
-│   └── metrics.py
-├── submissions/
-│   ├── README.md
-│   └── inbox/
+│   ├── metrics.py
+│   ├── render_leaderboard.py
+│   └── validate_submission.py
+├── data/
+│   └── public/
+│       ├── sample_submission.csv
+│       ├── test_edges.parquet
+│       ├── test_nodes.parquet
+│       ├── train_edges.parquet
+│       └── train_nodes.parquet
+├── docs/
+│   ├── leaderboard.css
+│   ├── leaderboard.csv
+│   ├── leaderboard.html
+│   └── leaderboard.js
+├── encryption/
+│   ├── decrypt.py
+│   ├── encrypt.py
+│   ├── generate_keys.py
+│   └── public_key.pem
 ├── leaderboard/
 │   ├── leaderboard.csv
-│   └── leaderboard.md
-└── .github/workflows/
-    ├── score_submission.yml
-    └── publish_leaderboard.yml
+│   ├── leaderboard.md
+│   └── update_leaderboard.py
+└── submissions/
+    └── README.md
+├── .DS_Store
+└── README.md
 ```
 ---
 
