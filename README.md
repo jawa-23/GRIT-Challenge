@@ -232,12 +232,12 @@ You will be submitting two files:
         2341,1200
         ...
         ```
-        
-    Rules:
-    - `id` must match exactly the IDs in `test_nodes.parquet`
-    - One row per test node
-    - No missing or duplicate IDs
-    - y_pred must be a non-negative integer
+            
+      Rules:
+        - `id` must match exactly the IDs in `test_nodes.parquet`
+        - One row per test node
+        - No missing or duplicate IDs
+        - y_pred must be a non-negative integer
     
    2) `metadata.json`
       This file should include your team name, your model type (Human, LLM, or Human + LLM), and any notes you want to include on the leaderboard.
@@ -266,14 +266,14 @@ You will be submitting two files:
    python encryption/encrypt.py predictions.csv encryption/public_key.pem predictions.csv.enc
    ```
 5. Create a new folder:
-```
-submissions/inbox/<team_name>/<run_id>/
-```
+   ```
+   submissions/inbox/<team_name>/<run_id>/
+   ```
    and upload your `predictions.csv.enc` and `metadata.json` to it.
 
 6. Open a Pull Request to `main`
 
-The PR will be **automatically scored** and the result will be added to the leaderboard.
+   The PR will be **automatically scored** and the result will be added to the leaderboard.
 
 ---
 
