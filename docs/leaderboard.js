@@ -177,6 +177,7 @@ async function main(){
   const status = document.getElementById("status");
   try{
     const res = await fetch("leaderboard.csv", {cache:"no-store"});
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const txt = await res.text();
     const rows = parseCSV(txt);
 
