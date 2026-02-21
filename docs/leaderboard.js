@@ -131,7 +131,7 @@ function setupColumnToggles(){
     ["rank","Rank"],
     ["team","Team"],
     ["model","Model"],
-    ["score","Score"],
+    ["score","MAE Score"],
     ["timestamp_utc","Date (UTC)"],
     ["notes","Notes"],
   ];
@@ -213,8 +213,8 @@ async function main(){
     document.getElementById("dateFilter").addEventListener("change", applyFilters);
 
     // default: sort by score desc
-    state.sortKey = "score";
-    state.sortDir = "desc";
+    state.sortKey = "rank";
+    state.sortDir = "asc";
     applyFilters();
   }catch(e){
     status.textContent = "Failed to load leaderboard.";
