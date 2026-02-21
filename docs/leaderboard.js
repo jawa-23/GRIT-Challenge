@@ -51,7 +51,7 @@ function renderTable(){
     const tr = document.createElement("tr");
     const rank = idx + 1;
     const cells = [
-      ["rank", rank],
+      ["rank", r.rank],
       ["team", r.team],
       ["model", r.model],
       ["score", r.score],
@@ -185,6 +185,7 @@ async function main(){
     const cleaned = rows
       .filter(r => r.team) // ignore empty template line
       .map(r => ({
+        rank: r.rank,
         timestamp_utc: r.timestamp_utc,
         team: r.team,
         model: (r.model || "").toLowerCase(),
