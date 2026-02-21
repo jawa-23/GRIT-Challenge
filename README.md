@@ -4,7 +4,7 @@
 
 ## 🏆 Live Leaderboard
 
-[![Leaderboard](https://img.shields.io/badge/View-Leaderboard-blue?style=for-the-badge)](https://jawa-23.github.io/GRIT-Challenge/leaderboard)
+[![Leaderboard](https://img.shields.io/badge/View-Leaderboard-blue?style=for-the-badge)](https://jawa-23.github.io/GRIT-Challenge)
 
 ---
 ## 1. Overview
