@@ -309,6 +309,7 @@ After a PR is scored, the result is added to:
 - No modification of evaluation scripts
 - Only encrypted predictions are submitted
 - Feature Engineering is allowed
+
 Violations may result in disqualification.
 
 ## 11. References
