@@ -20,7 +20,7 @@ The task is to predict the `nextRating` of each contestant in an **autoregressiv
 ---
 ## 2. Data
 ### Data Description
-The dataset is based on **Codeforces Competitive History from Kaggle**. Multiple preprocessing steps were applied to tailor it to the graph structure and the GRIT challenge.
+The data is derived from the *Codeforces Competitive History Dataset on Kaggle* and was preprocessed through multiple steps to tailor it to the graph structure and the GRIT challenge.
 
 Each snapshot corresponds to a single contest:
 - Nodes represent a subset of participating contestants.
@@ -36,8 +36,13 @@ Each node contains the following information:
 - **rating** – contestant’s rating after contest *i*  
 - **num_problems_solved** – number of problems solved in contest *i*  
 - **participation_gap** – number of contests since the contestant’s last participation  
+- **indicator** – a score that represents how well a participant performed in contest *i*
 - **contestant_count** – total number of contestants in contest *i*
-- **nextRating** – contestant’s rating in the next contest they participate in (*i+1*) → **target to be predicted**  
+- **nextRating** – contestant’s rating in the next contest they participate in (*i+1*) → **target to be predicted**
+
+*The intuition behind the indicator feature:*
+In the original dataset, each participant’s solved problems were recorded as a list of problem identifiers (for example, "A|B|C"). To use this information as a numerical feature, we created the indicator feature. In Codeforces contests, problems are ordered by increasing difficulty, and we assign each problem a weight using powers of two (1, 2, 4, 8, …) according to this order. The indicator for a participant is computed by summing the weights of all problems they solved. This numeric feature therefore captures both the number of problems solved and their relative difficulty. For example, a participant who solves the harder problems C and D would have a higher indicator score (4 + 8 = 12) than one who solves the easier problems A and B (1 + 2 = 3), even though both solved two problems.
+
 ---
 
 ### Edge Construction
@@ -155,7 +160,7 @@ If a contestant registers but does not enter on contest day, their rating may dr
 ---
 ### 4) Missing Values
 
-In a few samples, the raw dataset included rating changes but did not include the number of solved problems. This results in rare cases where:
+In a few samples (~ 8% of the training samples), the raw dataset included rating changes but did not include the number of solved problems. This results in rare cases where:
 
 $$
 \text{rating} > \text{oldRating}
@@ -302,5 +307,10 @@ After a PR is scored, the result is added to:
 - No manual labeling of test data
 - No modification of evaluation scripts
 - Only encrypted predictions are submitted
-
+- Feature Engineering is allowed
 Violations may result in disqualification.
+
+## 11. References
+
+- **Dataset:** [Codeforces Competitive History](https://www.kaggle.com/datasets/abukanabek/codeforces-competitive-history-dataset/)  
+- **Graph Neural Networks:** [BASIRA Lab - Deep Graph Learning Course](https://youtube.com/playlist?list=PLug43ldmRSo14Y_vt7S6vanPGh-JpHR7T&si=LsCm-Wyhcpp7Ljxu)
