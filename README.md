@@ -72,7 +72,8 @@ Inside the `training/` folder:
 Used to construct the **feature matrix** for each contest snapshot.
 
 Format:
-node_id, handle, contestId,	oldRating, rating,	problems_solved_num, contestants_count, nextRating
+contestId, node_id, handle, oldRating, rating, num_problems_solved, participation_gap, indicator, contestants_count, nextRating
+
 
 #### `edges.parquet`
 
