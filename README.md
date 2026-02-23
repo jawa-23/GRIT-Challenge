@@ -40,8 +40,9 @@ Each node contains the following information:
 - **contestant_count** – total number of contestants in contest *i*
 - **nextRating** – contestant’s rating in the next contest they participate in (*i+1*) → **target to be predicted**
 
-*The intuition behind the indicator feature:*
-In the original dataset, each participant’s solved problems were recorded as a list of problem identifiers (for example, "A|B|C"). To use this information as a numerical feature, we created the indicator feature. In Codeforces contests, problems are ordered by increasing difficulty, and we assign each problem a weight using powers of two (1, 2, 4, 8, …) according to this order. The indicator for a participant is computed by summing the weights of all problems they solved. This numeric feature therefore captures both the number of problems solved and their relative difficulty. For example, a participant who solves the harder problems C and D would have a higher indicator score (4 + 8 = 12) than one who solves the easier problems A and B (1 + 2 = 3), even though both solved two problems.
+💡*The intuition behind the indicator feature:*
+
+In the original dataset, each participant’s solved problems were recorded as a list of problem identifiers (for example, "A | B | C"). To use this information as a numerical feature, we created the indicator feature. In Codeforces contests, problems are ordered by increasing difficulty, and we assign each problem a weight using powers of two (1, 2, 4, 8, …) according to this order. The indicator for a participant is computed by summing the weights of all problems they solved. This numeric feature therefore captures both the number of problems solved and their relative difficulty. For example, a participant who solves the harder problems C and D would have a higher indicator score (4 + 8 = 12) than one who solves the easier problems A and B (1 + 2 = 3), even though both solved two problems.
 
 ---
 
