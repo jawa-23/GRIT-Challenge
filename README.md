@@ -223,6 +223,7 @@ Develop a model that:
 └── submissions/
     └── README.md
 ├── .DS_Store
+├── LICENSE
 └── README.md
 ```
 ---
