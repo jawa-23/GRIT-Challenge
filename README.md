@@ -65,9 +65,9 @@ Each contest snapshot is represented by:
 - An adjacency matrix  
 - A feature matrix  
 
-Inside the `training/` folder:
+Inside the `data/public` folder:
 
-#### `nodes.parquet`
+#### `train_nodes.parquet`
 
 Used to construct the **feature matrix** for each contest snapshot.
 
@@ -75,12 +75,14 @@ Format:
 contestId, node_id, handle, oldRating, rating, num_problems_solved, participation_gap, indicator, contestants_count, nextRating
 
 
-#### `edges.parquet`
+#### `train_edges.parquet`
 
 Used to construct the **adjacency matrix** for each contest snapshot.
 
 Format:
 contest_id, src, dst
+
+Graph, feature matrix, and adjacency matrix construction from these files is already implemented in the `starter_code.py`.
 
 ---
 
@@ -224,7 +226,8 @@ Develop a model that:
     └── README.md
 ├── .DS_Store
 ├── LICENSE
-└── README.md
+├── README.md
+└── starter_code.py
 ```
 ---
 
